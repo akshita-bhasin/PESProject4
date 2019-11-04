@@ -1,57 +1,42 @@
 /*
- * state_machine.c
+ * statemachine2.c
  *
- *  Created on: Nov 1, 2019
- *      Author: ASUS
+ *  Created on: Nov 4, 2019
+ *      Author: madhu
+ *      leveraged code : http://web.archive.org/web/20160517005245/http://www.gedan.net/2008/09/08/finite-state-machine-matrix-style-c-implementation
  */
-/*
-#include "state_machine.h"
+#include"statemachine2.h"
 
 extern uint8_t delay;
 extern uint8_t delay_end;
 
-state current_state=Temp_Reading;
+state current_state = Temp_Reading;
 event current_event;
-uint8_t i=0;
-
 uint8_t tempC, tempF, timeout_count=1, average=0;
 
-void temp_reading(void);
-void average_temp(void);
-void temp_alert(void);
-void disconnect_device(void);
-void Init_SysTick(void);
-void SysTick_Handler(void);
 
-void state_machine_1(void)
+stateElement stateTab[4] = {
+		{Temp_Reading, temp_reading},
+		{Average_Wait,average_temp},
+		{Temp_Alert,temp_alert},
+		{Disconnected,disconnect_device}
+};
+
+void eval_state(void)
 {
+	stateElement stateEvaluation = stateTab[current_state];
+	current_state = stateEvaluation.nextState;
+	(*stateEvaluation.actionToDo)();
+}
+
+
+void statemachine2()
+{
+	current_event = Complete;
+	action actionToDo = temp_reading;
 	while(1)
 	{
-		//current_event = ReadEvent();
-		switch(current_state)
-		{
-			case Temp_Reading: {
-				temp_reading();
-				break;
-			}
-			case Average_Wait: {
-				average_temp();
-
-				break;
-			}
-			case Temp_Alert: {
-				temp_alert();
-				break;
-			}
-			case Disconnected: {
-				disconnect_device();
-				break;
-			}
-			case End: {
-				return;
-				break;
-			}
-		}
+		eval_state();
 	}
 }
 
@@ -83,8 +68,8 @@ void temp_reading(void)
 void average_temp(void)
 {
 	if(timeout_count>=4){
-		//state_machine_2();
-		abcd();
+		//state_machine_1();
+		exit(1);
 	}
 	else
 		current_event = Timeout;
@@ -120,8 +105,7 @@ void temp_alert(void)
 void disconnect_device(void)
 {
 	PRINTF("Device disconnected\r\n");
-	current_state = End;
-	return;
+	exit(1);
 }
 
 void Init_SysTick(void) {
@@ -141,10 +125,6 @@ void SysTick_Handler(void) {
 	}
 }
 
-void abcd(void)
-{
-	PRINTF("I hate this world\n\r");
-	exit(1);
-}
 
-*/
+
+

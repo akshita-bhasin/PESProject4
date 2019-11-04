@@ -7,7 +7,7 @@ source/PESProject4.o source/PESProject4.d: ../source/PESProject4.c \
  ../drivers/fsl_common.h ../drivers/fsl_gpio.h ../board/peripherals.h \
  ../board/pin_mux.h ../board/clock_config.h ../CMSIS/MKL25Z4.h \
  ../utilities/fsl_debug_console.h ../source/i2c.h \
- ../source/state_machine.h
+ ../source/statemachine2.h
 
 ../board/board.h:
 
@@ -49,4 +49,4 @@ source/PESProject4.o source/PESProject4.d: ../source/PESProject4.c \
 
 ../source/i2c.h:
 
-../source/state_machine.h:
+../source/statemachine2.h:

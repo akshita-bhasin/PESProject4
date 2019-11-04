@@ -11,7 +11,8 @@
 #include "fsl_debug_console.h"
 
 #include "i2c.h"
-#include "state_machine.h"
+//#include "state_machine.h"
+#include<statemachine2.h>
 #include <stdint.h>
 /*
  * @brief   Application entry point.
@@ -53,7 +54,7 @@ int main(void)
     	Init_SysTick();
     	SysTick_Handler(); */
 
-    state_machine_1();
+    statemachine2();
     if(delay_end)
     	delay_end=0;
 

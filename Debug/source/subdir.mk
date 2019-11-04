@@ -9,7 +9,8 @@ C_SRCS += \
 ../source/logger.c \
 ../source/mtb.c \
 ../source/semihost_hardfault.c \
-../source/state_machine.c 
+../source/state_machine.c \
+../source/statemachine2.c 
 
 OBJS += \
 ./source/PESProject4.o \
@@ -17,7 +18,8 @@ OBJS += \
 ./source/logger.o \
 ./source/mtb.o \
 ./source/semihost_hardfault.o \
-./source/state_machine.o 
+./source/state_machine.o \
+./source/statemachine2.o 
 
 C_DEPS += \
 ./source/PESProject4.d \
@@ -25,7 +27,8 @@ C_DEPS += \
 ./source/logger.d \
 ./source/mtb.d \
 ./source/semihost_hardfault.d \
-./source/state_machine.d 
+./source/state_machine.d \
+./source/statemachine2.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
