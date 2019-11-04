@@ -1,0 +1,9 @@
+core_cm0plus.h:804:22:NVIC_SetPriority	24	static
+state_machine.c:26:6:state_machine_1	8	static
+state_machine.c:58:6:temp_reading	16	static
+state_machine.c:83:6:average_temp	8	static
+state_machine.c:108:6:temp_alert	8	static
+state_machine.c:120:6:disconnect_device	8	static
+state_machine.c:127:6:Init_SysTick	8	static
+state_machine.c:136:6:SysTick_Handler	8	static
+state_machine.c:144:6:abcd	8	static
