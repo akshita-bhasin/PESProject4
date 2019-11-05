@@ -14,14 +14,8 @@ state current_state=Temp_Reading;
 event current_event;
 uint8_t i=0;
 
-uint8_t tempC, tempF, disconnect_status, systick_count=0, timeout_count=1, average=0, flag=0;
-
-void temp_reading(void);
-void average_temp(void);
-void temp_alert(void);
-void disconnect_device(void);
-void Init_SysTick(void);
-void SysTick_Handler(void);
+int8_t tempC, tempF;
+uint8_t disconnect_status, systick_count=0, timeout_count=1, average=0, flag=0, disconnect_flag=0;
 
 void state_machine_1(void)
 {
@@ -96,11 +90,11 @@ void temp_reading(void)
 	log_string_detail(Debug, Temp_reading, "Temperature in Farhenheit is: ");
 	log_integer(tempF, 'd');
 	log_string("");
-    disconnect_status = i2c_read_byte(0x90, 0x01);
-    if(disconnect_status == 0) {
-    	current_event = Disconnect;
-    }
-	if(tempC < 27)
+ //   disconnect_status = i2c_read_byte(0x90, 0x01);
+	if(disconnect_flag == 1) {
+		current_event = Disconnect;
+	}
+	if(tempC < 0)
 		current_event = Alert;
 	else
 		current_event = Complete;
@@ -114,30 +108,36 @@ void temp_reading(void)
 	}
 }
 
-
 void average_temp(void)
 {
-	if(timeout_count>=4){
+/*	if(timeout_count>=4){
 		timeout_count=0;
 		if(flag==0) {
 			current_state = Temp_Reading;
 			flag=1;
+			average=0;
 			state_machine_2();
 		}
 		else {
 			current_state = Temp_Reading;
 			flag=0;
+			average=0;
 			state_machine_1();
 		}
 	}
-	else {
+	else { */
 		current_event = Timeout;
+//	}
+		 //   disconnect_status = i2c_read_byte(0x90, 0x01);
+		 //   if(disconnect_status == 0) {
+	if(disconnect_flag == 1) {
+		current_event = Disconnect;
 	}
+
 	if(current_event == Timeout) {
 		if(systick_count == 1) {
 			log_string("Inside case Average_Wait");
 			systick_count=0;
-//					current_event = Timeout;
 			turn_on_led_color('G');
 			if(timeout_count == 1)
 				average = tempC;
@@ -147,26 +147,39 @@ void average_temp(void)
 			log_string("");
 			current_state = Temp_Reading;
 			timeout_count++;
+
+			if(timeout_count>4){
+				timeout_count=0;
+				if(flag==0) {
+					current_state = Temp_Reading;
+					flag=1;
+					average=0;
+					state_machine_2();
+				}
+				else {
+					current_state = Temp_Reading;
+					flag=0;
+					average=0;
+					state_machine_1();
+				}
+			}
 		}
 	}
 	else if(current_event == Disconnect) {
 		current_state = Disconnected;
 	}
-    disconnect_status = i2c_read_byte(0x90, 0x01);
-    if(disconnect_status == 0) {
-    	current_event = Disconnect;
-    }
-
 }
 
 void temp_alert(void)
 {
 	log_string("Inside case Temp_Alert");
 	turn_on_led_color('B');
-	PRINTF("\r\nTemperature is below 25 degree Celsius\r\n");
+	log_string("");
+	log_string_detail(Debug, Temp_Alert, "Temperature is below 25 degree Celsius");
 	current_event = Complete;
-    disconnect_status = i2c_read_byte(0x90, 0x01);
-    if(disconnect_status == 0) {
+ //   disconnect_status = i2c_read_byte(0x90, 0x01);
+ //   if(disconnect_status == 0) {
+    if(disconnect_flag == 1) {
     	current_event = Disconnect;
     }
 	if(current_event == Complete) {
@@ -194,7 +207,7 @@ void end(void)
 }
 
 void Init_SysTick(void) {
-	SysTick->LOAD = (48000000L/8);
+	SysTick->LOAD = (48000000L/6);
 	NVIC_SetPriority(SysTick_IRQn, 3);
 	SysTick->VAL=0;
 	SysTick->CTRL = SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;

@@ -18,7 +18,8 @@
  * @brief   Application entry point.
  */
 
-uint8_t post_status, post_flag, tempinC, alert_status_tl0, alert_status_th0;
+uint8_t post_status, post_flag, alert_status_tl0, alert_status_th0;
+int8_t tempinC;
 
 void delay_loop(uint16_t num)
 {
@@ -40,12 +41,10 @@ int main(void)
     post_status = i2c_read_byte(0x90, 0x01);
     if(post_status == 96 || post_status == 98) {
     	log_string_detail(Status, I2c_read_byte, "POST tests successful");
- //   	PRINTF("POST tests successful\r\n");
     	post_flag = 1;
     }
     else {
     	log_string_detail(Status, I2c_read_byte, "POST tests failed");
-  //  	PRINTF("POST tests failed\r\n");
     	post_flag=0;
     }
 
@@ -65,7 +64,7 @@ int main(void)
 	Init_SysTick();
 
 	tempinC = i2c_read_bytes(0x90, 0x00);
-	PRINTF("\r\nTemperagture in Celsius: %d\r\n", tempinC);
+	PRINTF("\r\nTemperature in Celsius: %d\r\n", tempinC);
 	uint8_t init_tl0 = i2c_read_byte(0x90, 0x02);
 	PRINTF("TL0: %d\r\n", init_tl0);
 
@@ -84,6 +83,7 @@ int main(void)
 	delay_loop(10000);
 	alert_status_th0 = i2c_read_byte(0x90, 0x03);
 	PRINTF("Alert: %d\r\n", alert_status_th0);
-    state_machine_1();
+	if(post_flag==1)
+		state_machine_1();
    return 0 ;
 }

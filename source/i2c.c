@@ -7,6 +7,7 @@
 
 #include "i2c.h"
 uint8_t data[3];
+extern uint8_t disconnect_flag;
 
 void I2C_Init(void)
 {
@@ -55,15 +56,24 @@ void I2C_write_byte(uint8_t reg, uint8_t data)
      I2C_M_START;                 // Generate START SIGNAL
 
      I2C0->D = 0x90;
-     I2C_WAIT;
+     if(i2c_wait())
+     {
+    	 disconnect_flag=1;
+     }
 
      I2C0->D = reg;              // Device register address
      /* Pointer register byte 000000+(00) for temperature register read only  */
      //changed to configuration register
-     I2C_WAIT;
+     if(i2c_wait())
+     {
+    	 disconnect_flag=1;
+     }
 
      I2C0->D = data;            // Send Configuration register byte 1
-     I2C_WAIT;
+     if(i2c_wait())
+     {
+    	 disconnect_flag=1;
+     }
 
      I2C_M_STOP;
      //Send stop bit
@@ -75,18 +85,30 @@ void I2C_write_bytes(uint8_t reg, uint8_t data1, uint8_t data2)
      I2C_M_START;                 // Generate START SIGNAL
 
      I2C0->D = 0x90;
-     I2C_WAIT;
+     if(i2c_wait())
+     {
+    	 disconnect_flag=1;
+     }
 
      I2C0->D = reg;              // Device register address
      /* Pointer register byte 000000+(00) for temperature register read only  */
      //changed to configuration register
-     I2C_WAIT;
+     if(i2c_wait())
+     {
+    	 disconnect_flag=1;
+     }
 
      I2C0->D = data1;            // Send Configuration register byte 1
-     I2C_WAIT;
+     if(i2c_wait())
+     {
+    	 disconnect_flag=1;
+     }
 
      I2C0->D = data2;            // Send Configuration register byte 2
-     I2C_WAIT;
+     if(i2c_wait())
+     {
+    	 disconnect_flag=1;
+     }
 
      I2C_M_STOP;
      //Send stop bit
@@ -99,21 +121,33 @@ uint8_t i2c_read_byte(uint8_t dev, uint8_t reg)
 	I2C_TRAN;
 	I2C_M_START;
 	I2C0->D = dev;
-	I2C_WAIT;
+    if(i2c_wait())
+    {
+   	 disconnect_flag=1;
+    }
 
 	I2C0->D = reg;
-	I2C_WAIT;
+    if(i2c_wait())
+    {
+   	 disconnect_flag=1;
+    }
 
 	I2C_M_RSTART;
 
 	I2C0->D = (dev|0x1);
-	I2C_WAIT;
+    if(i2c_wait())
+    {
+   	 disconnect_flag=1;
+    }
 
 	I2C_REC;
 	NACK;
 
 	data = I2C0->D;
-	I2C_WAIT;
+    if(i2c_wait())
+    {
+   	 disconnect_flag=1;
+    }
 
 	I2C_M_STOP;
 	data = I2C0->D;
@@ -121,41 +155,80 @@ uint8_t i2c_read_byte(uint8_t dev, uint8_t reg)
 	return data;
 }
 
-uint8_t i2c_read_bytes(uint8_t dev, uint8_t reg)
+uint8_t i2c_wait(void)
 {
-	uint16_t temp;
-	uint8_t tempC;
+	uint8_t connect = 0;
+	volatile uint16_t i;
+	while((I2C0->S &I2C_S_IICIF_MASK) == 0)
+	{
+		i++;
+		if(i>65535)
+			break;
+	}
+	if(i>65535)
+		connect = 1;
+	else
+		connect = 0;
+
+	I2C0->S |= I2C_S_IICIF_MASK;
+
+	return connect;
+}
+int8_t i2c_read_bytes(uint8_t dev, uint8_t reg)
+{
+	int16_t temp;
+	int8_t tempC;
 
 	I2C_TRAN;
 	I2C_M_START;
 	I2C0->D = dev;
-	I2C_WAIT;
+    if(i2c_wait())
+    {
+   	 disconnect_flag=1;
+    }
 
 	I2C0->D = reg;
-	I2C_WAIT;
+    if(i2c_wait())
+    {
+   	 disconnect_flag=1;
+    }
 
 	I2C_M_RSTART;
 
 	I2C0->D = (dev|0x1);
-	I2C_WAIT;
+    if(i2c_wait())
+    {
+   	 disconnect_flag=1;
+    }
 
 	I2C_REC;
 	ACK;
 
 	data[0] = I2C0->D;
-	I2C_WAIT;
+    if(i2c_wait())
+    {
+   	 disconnect_flag=1;
+    }
 
 	data[0] = I2C0->D;
-	I2C_WAIT;
+    if(i2c_wait())
+    {
+   	 disconnect_flag=1;
+    }
 
 	NACK;
 
 	data[1] = I2C0->D;
-	I2C_WAIT;
+    if(i2c_wait())
+    {
+   	 disconnect_flag=1;
+    }
 
 	I2C_M_STOP;
 
 	temp = ((data[0] << 4) | (data[1] >> 4));
+	if(temp> 0x7FFF)
+		temp |= 0xF000;
 	tempC = temp * 0.0625;
 	return tempC;
 }
