@@ -1,11 +1,9 @@
 /*
- * @file logger.h
- * @brief contains function prototypes and header files for logger.c
- * @author Akshita Bhasin and Madhukar Arora
- * @date 10/15/2019
- * @version 1.0
+ * @File  : logger.h
+ * @Brief : contains function prototypes and includes for logger implementation
+ * @Author : Akshita Bhasin and Madhukar Arora
+ * @Created On : 11/1/2019
  */
-
 
 #ifndef LOGGER_H_
 #define LOGGER_H_

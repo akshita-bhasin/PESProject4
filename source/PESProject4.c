@@ -1,6 +1,9 @@
-/**
- * @file    PESProject4.c
- * @brief   Application entry point.
+/*
+ * @File Name   : PesProject4.c
+ * @Brief  : Application Entry Point
+ * @Author : Akshita Bhasin and Madhukar Arora
+ * @Created On : 10/25/2019
+ * leveraged code : http://web.archive.org/web/20160517005245/http://www.gedan.net/2008/09/08/finite-state-machine-matrix-style-c-implementation
  */
 #include <stdio.h>
 #include "board.h"

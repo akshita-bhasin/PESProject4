@@ -1,11 +1,9 @@
 /*
- * state_machine.c
- *
- *  Created on: Nov 1, 2019
- *      Author: ASUS
- *
- *      leveraged code : http://web.archive.org/web/20160517005245/http://www.gedan.net/2008/09/08/finite-state-machine-matrix-style-c-implementation
- *
+ * @File Name  : state_machine.c
+ * @Brief : contains statemachine implementation
+ * @Author : Akshita Bhasin and Madhukar Arora
+ * @Created On : 11/1/2019
+ * Leveraged Code : http://web.archive.org/web/20160517005245/http://www.gedan.net/2008/09/08/finite-state-machine-matrix-style-c-implementation
  */
 
 #include "state_machine.h"
@@ -16,6 +14,7 @@ uint8_t i=0;
 
 uint8_t tempC, tempF, disconnect_status, systick_count=0, timeout_count=1, average=0, flag=0;
 
+//function prototypes
 void temp_reading(void);
 void average_temp(void);
 void temp_alert(void);
@@ -23,12 +22,18 @@ void disconnect_device(void);
 void Init_SysTick(void);
 void SysTick_Handler(void);
 
+/* function name : state_machine_1
+ * return type : void
+ * parameters :  void
+ * @brief : contains implementation of State Oriented state machine
+ *          switches between different states of the state machine and
+ *          does the appropriate function.
+ */
 void state_machine_1(void)
 {
 	log_string_detail(Status, State_machine_1, "Inside state machine 1");
 	while(1)
 	{
-		//current_event = ReadEvent();
 		switch(current_state)
 		{
 			case Temp_Reading: {
@@ -63,6 +68,11 @@ stateElement stateTab[5] = {
 		{End, end}
 };
 
+/* function name : eval_state
+ * return type : void
+ * parameters :  void
+ * @brief : used to find the next state and the action/function to be executed
+ */
 void eval_state(void)
 {
 	stateElement stateEvaluation = stateTab[current_state];
@@ -70,7 +80,11 @@ void eval_state(void)
 	(*stateEvaluation.actionToDo)();
 }
 
-
+/* function name : state_machine_2
+ * return type : void
+ * parameters :  void
+ * @brief : contains implementation of Table Driven state machine
+ */
 void state_machine_2()
 {
 	log_string_detail(Status, State_machine_2, "Inside state machine 2");
@@ -82,6 +96,13 @@ void state_machine_2()
 	}
 }
 
+/* function name : temp_reading
+ * return type : void
+ * parameters :  void
+ * @brief : executed if current state is temperature reading
+ *          reads the temperature from the TMP102 and determines the next state
+ *          based on the events
+ */
 void temp_reading(void)
 {
 	log_string("Inside case Temp_Reading");
@@ -114,7 +135,14 @@ void temp_reading(void)
 	}
 }
 
-
+/* function name : average_temp
+ * return type : void
+ * parameters :  void
+ * @brief : executed if current state is average/wait
+ *          shows the last read temperature from the TMP102
+ *          and displays the average value
+ *          determines the next state based on the events
+ */
 void average_temp(void)
 {
 	if(timeout_count>=4){
@@ -159,6 +187,13 @@ void average_temp(void)
 
 }
 
+/* function name : temp_alert
+ * return type : void
+ * parameters :  void
+ * @brief : executed if current state is Temp Alert
+ *          determines the next state of the statemachine
+ *          based on the current event
+ */
 void temp_alert(void)
 {
 	log_string("Inside case Temp_Alert");
@@ -177,6 +212,12 @@ void temp_alert(void)
 	}
 }
 
+/* function name : disconnect_device
+ * return type : void
+ * parameters :  void
+ * @brief : executed if current state is Disconnected
+ *          and changes the state to End
+ */
 void disconnect_device(void)
 {
 	log_string("Inside case Disconnected");
@@ -187,12 +228,24 @@ void disconnect_device(void)
 	return;
 }
 
+/* function name : end
+ * return type : void
+ * parameters :  void
+ * @brief : executed if current state is End
+ *          and causes exit from state machine 1 / state machine 2
+ */
 void end(void)
 {
 	log_string("Inside case End");
 	exit(1);
 }
 
+/* function name : Init_SysTick
+ * return type : void
+ * parameters :  void
+ * @brief : initializes the SysTick
+ * leverage : //https://community.nxp.com/thread/418592
+ */
 void Init_SysTick(void) {
 	SysTick->LOAD = (48000000L/8);
 	NVIC_SetPriority(SysTick_IRQn, 3);
@@ -200,8 +253,12 @@ void Init_SysTick(void) {
 	SysTick->CTRL = SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 }
 
-
-//https://community.nxp.com/thread/418592
+/* function name : SysTick_Handler
+ * return type : void
+ * parameters :  void
+ * @brief : generates required time delay
+ * leverage : //https://community.nxp.com/thread/418592
+ */
 void SysTick_Handler(void) {
 	systick_count++;
 	PRINTF("\r\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Timeout worked\r\n");

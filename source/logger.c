@@ -1,15 +1,22 @@
 /*
- * @file  : logger.c
- * @brief : contains logger implementation
- * @author : Akshita Bhasin and Madhukar Arora
- * @date : 10/15/2019
- * @version 1.0
+ * @File Name  : logger.c
+ * @Brief : contains logger implementation
+ * @Author : Akshita Bhasin and Madhukar Arora
+ * @Created On : 11/1/2019
  */
 
 #include "logger.h"
+
+//function prototypes
 const char* get_func_name(function_name func_name);
 const char* get_log_level(log_level logLevel);
 
+/* function name : log_string_detail
+ * return type : void
+ * parameters :logLevel - variable of enum type log_level, funcName - variable of enum type function_name, char *str - points to string
+ * @brief : Uses the log level and the status of the function
+ *          and prints the details
+ */
 void log_string_detail(log_level logLevel, function_name funcName, char * str)
 {
 	char * log = get_log_level(logLevel);
@@ -19,46 +26,21 @@ void log_string_detail(log_level logLevel, function_name funcName, char * str)
 	PRINTF("%s\r\n", str);
 }
 
-
+/* function name : log_string
+ * return type : void
+ * parameters : char *str - pointer to a string
+ * @brief : prints a debug message to the terminal
+ */
 void log_string(char * str)
 {
 	PRINTF("\r\n%s\r\n", str);
 }
-/* function name : log_data
- * return type : void
- * parameters : uint8_t* seqAddr (address), size_t length(number of bytes)
- * @brief : logs the data at a memory location
- */
-/*void log_data(uint8_t * seqAddr, size_t length)
-{
-	if(logger_status==1){
-	#ifdef KL25Z_LOG
-		PRINTF("Contents at memory location 0X%x: \n\r",seqAddr);
-	#endif
-	#ifdef PC_LOG
-		printf("Contents at memory location 0X%x: \n\r",seqAddr);
-	#endif
-		for(uint8_t i=0;i<length;i++){
-		#ifdef KL25Z_LOG
-			PRINTF("0x%x ",*(seqAddr+i));
-		#endif
-		#ifdef PC_LOG
-			printf("0x%x ",*(seqAddr+i));
-		#endif
-		}
-	#ifdef KL25Z_LOG
-		PRINTF("\n\r");
-	#endif
-	#ifdef PC_LOG
-		printf("\n\r");
-	#endif
-	}
-} */
+
 
 /* function name : log_char
  * return type : void
- * parameters : char *dispStr
- * @brief : if logger enabled, logger logs a string
+ * parameters : char ch
+ * @brief : prints a single character to the terminal
  */
 void log_char(char ch)
 {
@@ -67,8 +49,8 @@ void log_char(char ch)
 
 /* function name : log_integer
  * return type : void
- * parameters : uint32_t * dispInt(address), size_t length(number of bytes)
- * @brief : if logger enabled, logger logs the values at an address
+ * parameters : uint8_t num - number, char type - number is decimal or hexadecimal
+ * @brief : prints a number to the terminal depending on its type
  */
 void log_integer(uint8_t num, char type)
 {
@@ -80,6 +62,12 @@ void log_integer(uint8_t num, char type)
 		PRINTF("%d", num);
 }
 
+
+/* function name : get_func_name
+ * return type : const char*
+ * parameters : function_name func_name - func_name is an variable of enum type function_name
+ * @brief : returns a string
+ */
 const char* get_func_name(function_name func_name)
 {
 	switch(func_name)
@@ -110,7 +98,11 @@ const char* get_func_name(function_name func_name)
 							break;
 	}
 }
-
+/* function name : get_log_level
+ * return type : const char*
+ * parameters : log_level logLevel- logLevel is a variable of enum type log_level
+ * @brief : returns a string
+ */
 const char* get_log_level(log_level logLevel)
 {
 	switch(logLevel)

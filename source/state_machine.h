@@ -1,8 +1,9 @@
 /*
- * state_machine.h
- *
- *  Created on: Nov 1, 2019
- *      Author: ASUS
+ * @File Name : state_machine.h
+ * @Brief : contains includes, enum declarations and function prototypes for
+ *          statemachine implementation
+ * @Author : Akshita Bhasin and Madhukar Arora
+ * @Created On: 11/1/2019
  */
 
 #include "i2c.h"
@@ -11,7 +12,7 @@
 
 #ifndef STATE_MACHINE_H_
 #define STATE_MACHINE_H_
-
+//enum of states
 typedef enum
 {
 	Temp_Reading,
@@ -21,7 +22,7 @@ typedef enum
 	End
 } state;
 
-
+//enum of events
 typedef enum
 {
 	Complete,
@@ -31,14 +32,15 @@ typedef enum
 	Exit
 }event;
 
-typedef void(*action)(void);
-
-
 typedef struct
 {
 	state nextState;
 	action actionToDo;
 }stateElement;
+
+//function prototypes
+
+typedef void(*action)(void);
 
 void temp_reading(void);
 void average_temp(void);

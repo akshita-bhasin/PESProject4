@@ -1,13 +1,22 @@
 /*
- * i2c.c
- *
- *  Created on: Oct 29, 2019
- *      Author: ASUS
+ *@File Name : i2c.c
+ *@Brief: Source file contains I2C configuration with the TMP102 Temperature sensor module
+ *Created on: Oct 29, 2019
+ *Author: Akshita Bhasin & Madhukar Arora
  */
 
 #include "i2c.h"
-uint8_t data[3];
 
+
+uint8_t data[3]; //to store temperature values received from the sensor
+
+
+/*
+ * function name : I2C_Init
+ * parameter : void
+ * return type : void
+ * @brief : configures the I2C registers on the FRDM KL25Z
+ */
 void I2C_Init(void)
 {
 	/* Enable clock for I2C0 module */
@@ -45,10 +54,13 @@ void I2C_Init(void)
 #define NACK        I2C0->C1 |= I2C_C1_TXAK_MASK
 #define ACK         I2C0->C1 &= ~I2C_C1_TXAK_MASK
 
-//extern uint8_t delay;
-//extern uint8_t delay_end;
 
-
+/*
+ * function name : I2C_write_byte
+ * parameter : uint8_t reg - pointer register value , uint8_t data - value for configuration register
+ * return type : void
+ * @brief : configures the I2C registers on the FRDM KL25Z
+ */
 void I2C_write_byte(uint8_t reg, uint8_t data)
 {
      I2C_TRAN;                    // Transmit
@@ -69,6 +81,12 @@ void I2C_write_byte(uint8_t reg, uint8_t data)
      //Send stop bit
 }
 
+/*
+ * function name : I2C_write_bytes
+ * parameter : uint8_t reg - pointer register value , uint8_t data1 - byte1,uint8_t data2 - byte2
+ * return type : void
+ * @brief : configures the I2C registers on the FRDM KL25Z
+ */
 void I2C_write_bytes(uint8_t reg, uint8_t data1, uint8_t data2)
 {
      I2C_TRAN;                    // Transmit
@@ -92,6 +110,12 @@ void I2C_write_bytes(uint8_t reg, uint8_t data1, uint8_t data2)
      //Send stop bit
 }
 
+/*
+ * function name : I2C_read_byte
+ * parameter : uint8_t dev, uint8_t reg - pointer register value
+ * return type : uint8_t
+ * @brief : reads 1 byte of data from the TMP102
+ */
 uint8_t i2c_read_byte(uint8_t dev, uint8_t reg)
 {
 	uint8_t data;
@@ -121,6 +145,12 @@ uint8_t i2c_read_byte(uint8_t dev, uint8_t reg)
 	return data;
 }
 
+/*
+ * function name : I2C_read_byte
+ * parameter : uint8_t dev, uint8_t reg - pointer register value
+ * return type : uint8_t
+ * @brief : reads 2 bytes of temperature data from the TMP102 and returns temperature in Celsius
+ */
 uint8_t i2c_read_bytes(uint8_t dev, uint8_t reg)
 {
 	uint16_t temp;
@@ -160,6 +190,12 @@ uint8_t i2c_read_bytes(uint8_t dev, uint8_t reg)
 	return tempC;
 }
 
+/*
+ * function name : alert_init
+ * parameter : void
+ * return type : void
+ * @brief : initializes the TLow and THigh value on the TMP102
+ */
 void alert_init(void)
 {
 	uint8_t tl0a=  0x1d;

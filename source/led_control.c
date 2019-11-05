@@ -1,12 +1,19 @@
 /*
- * led_control.c
- *
- *  Created on: Nov 4, 2019
- *      Author: ASUS
+ *@File Name : led_control.c
+ *@Brief: Source file contains code for controlling the RGB LED
+ *        on the FRDM KL25Z Board
+ *Created on: Oct 29, 2019
+ *Author: Akshita Bhasin & Madhukar Arora
  */
 
 #include "led_control.h"
 
+/*
+ * function name : delay_led
+ * parameter : uint16_t num - number used to generate a simple delay
+ * return type : void
+ * @brief : generates a simple delay by decrementing a number
+ */
 void delay_led(uint16_t num)
 {
 	uint32_t num1 = num*100;
@@ -14,6 +21,12 @@ void delay_led(uint16_t num)
 		num1--;
 }
 
+/*
+ * function name : turn_on_led_color
+ * parameter : char color - code for which LED to glow
+ * return type : void
+ * @brief : turns on a single LED depending on the parameter, 'R'- Red 'B'-Blue G - 'Green'
+ */
 void turn_on_led_color(char color)
 {
 	LED_RED_INIT(1);
@@ -23,8 +36,6 @@ void turn_on_led_color(char color)
 	LED_BLUE_OFF();
 	LED_GREEN_OFF();
 
-	// for MODULE=FB_DEBUG; blink led, print message via serial terminal
-	//	and printing timing cycle delay for the event
 	if(color == 'R') {
 		LED_BLUE_OFF(); /*!< Turn off target LED_BLUE */
 		LED_GREEN_OFF(); /*!< Turn off target LED_GREEN */
