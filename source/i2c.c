@@ -48,29 +48,49 @@ void I2C_Init(void)
 //extern uint8_t delay;
 //extern uint8_t delay_end;
 
-void I2C_write_byte(uint8_t reg, uint8_t data1, uint8_t data2)
-{
 
+void I2C_write_byte(uint8_t reg, uint8_t data)
+{
      I2C_TRAN;                    // Transmit
-     I2C_M_START;                    // Generate START SIGNAL
+     I2C_M_START;                 // Generate START SIGNAL
 
      I2C0->D = 0x90;
      I2C_WAIT;
 
-     I2C0->D = reg;                           // Device register address
+     I2C0->D = reg;              // Device register address
      /* Pointer register byte 000000+(00) for temperature register read only  */
      //changed to configuration register
      I2C_WAIT;
 
-     I2C0->D = data1;                            // Send Configuration register byte 1
+     I2C0->D = data;            // Send Configuration register byte 1
      I2C_WAIT;
 
-     I2C0->D = data2;                            // Send Configuration register byte 2
+     I2C_M_STOP;
+     //Send stop bit
+}
+
+void I2C_write_bytes(uint8_t reg, uint8_t data1, uint8_t data2)
+{
+     I2C_TRAN;                    // Transmit
+     I2C_M_START;                 // Generate START SIGNAL
+
+     I2C0->D = 0x90;
      I2C_WAIT;
 
-     I2C_M_STOP;                  //Send stop bit
-  }
+     I2C0->D = reg;              // Device register address
+     /* Pointer register byte 000000+(00) for temperature register read only  */
+     //changed to configuration register
+     I2C_WAIT;
 
+     I2C0->D = data1;            // Send Configuration register byte 1
+     I2C_WAIT;
+
+     I2C0->D = data2;            // Send Configuration register byte 2
+     I2C_WAIT;
+
+     I2C_M_STOP;
+     //Send stop bit
+}
 
 uint8_t i2c_read_byte(uint8_t dev, uint8_t reg)
 {
@@ -140,21 +160,15 @@ uint8_t i2c_read_bytes(uint8_t dev, uint8_t reg)
 	return tempC;
 }
 
-/*
-void Init_SysTick(void) {
-	SysTick->LOAD = (48000000L/16);
-	NVIC_SetPriority(SysTick_IRQn, 3);
-	SysTick->VAL=0;
-	SysTick->CTRL = SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
-}
+void alert_init(void)
+{
+	uint8_t tl0a=  0x1d;
+	uint8_t tl0b= 0x00;
 
+	uint8_t th0a = 0x1d;
+	uint8_t th0b = 0x00;
 
-//https://community.nxp.com/thread/418592
-void SysTick_Handler(void) {
-	if(delay) {
-		delay--;
-		if(delay==0)
-			delay_end = 1;
-	}
+	I2C_write_bytes(0x02, tl0a, tl0b);
+	delay_loop(10000);
+	I2C_write_bytes(0x03, th0a, th0b);
 }
-*/

@@ -6,29 +6,29 @@
 C_SRCS += \
 ../source/PESProject4.c \
 ../source/i2c.c \
+../source/led_control.c \
 ../source/logger.c \
 ../source/mtb.c \
 ../source/semihost_hardfault.c \
-../source/state_machine.c \
-../source/statemachine2.c 
+../source/state_machine.c 
 
 OBJS += \
 ./source/PESProject4.o \
 ./source/i2c.o \
+./source/led_control.o \
 ./source/logger.o \
 ./source/mtb.o \
 ./source/semihost_hardfault.o \
-./source/state_machine.o \
-./source/statemachine2.o 
+./source/state_machine.o 
 
 C_DEPS += \
 ./source/PESProject4.d \
 ./source/i2c.d \
+./source/led_control.d \
 ./source/logger.d \
 ./source/mtb.d \
 ./source/semihost_hardfault.d \
-./source/state_machine.d \
-./source/statemachine2.d 
+./source/state_machine.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

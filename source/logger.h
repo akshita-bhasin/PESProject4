@@ -26,25 +26,28 @@ typedef enum
 
 typedef enum
 {
-	I2C_Init,
-	i2c_read_byte,
-	i2c_read_bytes,
-	Init_SysTick,
-	state_machine_1,
-	temp_reading,
-	average_temp,
-	temp_alert,
-	disconnect_device
+	i2C_Init,
+	I2c_read_byte,
+	I2c_read_bytes,
+	init_SysTick,
+	State_machine_1,
+	State_machine_2,
+	Temp_reading,
+	Average_temp,
+	Temp_alert,
+	Disconnect_device,
+	END,
+	Turn_on_LED_color
 }function_name;
 
 const char* get_func_name(function_name func_name);
 
 const char* get_log_level(log_level logLevel);
 
-void log_string_detail(log_level logLevel, function_name funcName, char * str);
+void log_string_detail(log_level logLevel, function_name func_name, char * str);
 
 // Log_integer – display an integer
-void log_integer(uint32_t * dispInt, size_t length);
+void log_integer(uint8_t num, char type);
 
 // Log_char - display a character
 void log_char(char ch);

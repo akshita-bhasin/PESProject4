@@ -3,18 +3,18 @@
  *
  *  Created on: Nov 1, 2019
  *      Author: ASUS
+ *
+ *      leveraged code : http://web.archive.org/web/20160517005245/http://www.gedan.net/2008/09/08/finite-state-machine-matrix-style-c-implementation
+ *
  */
-/*
-#include "state_machine.h"
 
-extern uint8_t delay;
-extern uint8_t delay_end;
+#include "state_machine.h"
 
 state current_state=Temp_Reading;
 event current_event;
 uint8_t i=0;
 
-uint8_t tempC, tempF, timeout_count=1, average=0;
+uint8_t tempC, tempF, disconnect_status, systick_count=0, timeout_count=1, average=0, flag=0;
 
 void temp_reading(void);
 void average_temp(void);
@@ -25,6 +25,7 @@ void SysTick_Handler(void);
 
 void state_machine_1(void)
 {
+	log_string_detail(Status, State_machine_1, "Inside state machine 1");
 	while(1)
 	{
 		//current_event = ReadEvent();
@@ -36,7 +37,6 @@ void state_machine_1(void)
 			}
 			case Average_Wait: {
 				average_temp();
-
 				break;
 			}
 			case Temp_Alert: {
@@ -48,23 +48,58 @@ void state_machine_1(void)
 				break;
 			}
 			case End: {
-				return;
+				end();
 				break;
 			}
 		}
 	}
 }
 
+stateElement stateTab[5] = {
+		{Temp_Reading, temp_reading},
+		{Average_Wait,average_temp},
+		{Temp_Alert,temp_alert},
+		{Disconnected,disconnect_device},
+		{End, end}
+};
+
+void eval_state(void)
+{
+	stateElement stateEvaluation = stateTab[current_state];
+	current_state = stateEvaluation.nextState;
+	(*stateEvaluation.actionToDo)();
+}
+
+
+void state_machine_2()
+{
+	log_string_detail(Status, State_machine_2, "Inside state machine 2");
+	current_event = Complete;
+	action actionToDo = temp_reading;
+	while(1)
+	{
+		eval_state();
+	}
+}
+
 void temp_reading(void)
 {
+	log_string("Inside case Temp_Reading");
+	turn_on_led_color('G');
 	 //   post_status = i2c_read_bytes(0x90, 0x00);
 	 //   printf("Post Status Success(0)/Failed(1): %d", post_status);
 	tempC = i2c_read_bytes(0x90, 0x00);
-	PRINTF("\r\nTemperature in Celsius is: \r\n");
-	PRINTF("%dC",tempC);
-	PRINTF("\r\nTemperature in Farhenheit is: \r\n");
+	log_string_detail(Debug, Temp_reading, "Temperature in Celsius is: ");
+	log_integer(tempC, 'd');
+	log_string("");
 	tempF = (tempC * 1.8) + 32;
-	PRINTF("%dF",tempF);
+	log_string_detail(Debug, Temp_reading, "Temperature in Farhenheit is: ");
+	log_integer(tempF, 'd');
+	log_string("");
+    disconnect_status = i2c_read_byte(0x90, 0x01);
+    if(disconnect_status == 0) {
+    	current_event = Disconnect;
+    }
 	if(tempC < 27)
 		current_event = Alert;
 	else
@@ -83,32 +118,57 @@ void temp_reading(void)
 void average_temp(void)
 {
 	if(timeout_count>=4){
-		//state_machine_2();
-		abcd();
+		timeout_count=0;
+		if(flag==0) {
+			current_state = Temp_Reading;
+			flag=1;
+			state_machine_2();
+		}
+		else {
+			current_state = Temp_Reading;
+			flag=0;
+			state_machine_1();
+		}
 	}
-	else
+	else {
 		current_event = Timeout;
-	if(timeout_count == 1)
-		average = tempC;
-	average = (average + tempC)/2;
-	PRINTF("\r\nAverage Temperature: \r\n");
-	PRINTF("%d",average);
+	}
 	if(current_event == Timeout) {
-		Init_SysTick();
-		SysTick_Handler();
+		if(systick_count == 1) {
+			log_string("Inside case Average_Wait");
+			systick_count=0;
 //					current_event = Timeout;
-		current_state = Temp_Reading;
-		timeout_count++;
+			turn_on_led_color('G');
+			if(timeout_count == 1)
+				average = tempC;
+			average = (average + tempC)/2;
+			log_string("Average Temperature: ");
+			log_integer(average, 'd');
+			log_string("");
+			current_state = Temp_Reading;
+			timeout_count++;
+		}
 	}
 	else if(current_event == Disconnect) {
 		current_state = Disconnected;
 	}
+    disconnect_status = i2c_read_byte(0x90, 0x01);
+    if(disconnect_status == 0) {
+    	current_event = Disconnect;
+    }
+
 }
 
 void temp_alert(void)
 {
+	log_string("Inside case Temp_Alert");
+	turn_on_led_color('B');
 	PRINTF("\r\nTemperature is below 25 degree Celsius\r\n");
 	current_event = Complete;
+    disconnect_status = i2c_read_byte(0x90, 0x01);
+    if(disconnect_status == 0) {
+    	current_event = Disconnect;
+    }
 	if(current_event == Complete) {
 		current_state = Average_Wait;
 	}
@@ -119,13 +179,22 @@ void temp_alert(void)
 
 void disconnect_device(void)
 {
-	PRINTF("Device disconnected\r\n");
+	log_string("Inside case Disconnected");
+	turn_on_led_color('R');
+ //   disconnect_status = i2c_read_byte(0x90, 0x01);
+	log_string_detail(Debug, Disconnect_device, "Device disconnected");
 	current_state = End;
 	return;
 }
 
+void end(void)
+{
+	log_string("Inside case End");
+	exit(1);
+}
+
 void Init_SysTick(void) {
-	SysTick->LOAD = (48000000L/16);
+	SysTick->LOAD = (48000000L/8);
 	NVIC_SetPriority(SysTick_IRQn, 3);
 	SysTick->VAL=0;
 	SysTick->CTRL = SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
@@ -134,17 +203,8 @@ void Init_SysTick(void) {
 
 //https://community.nxp.com/thread/418592
 void SysTick_Handler(void) {
-	if(delay) {
-		delay--;
-		if(delay==0)
-			delay_end = 1;
-	}
+	systick_count++;
+	PRINTF("\r\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Timeout worked\r\n");
 }
 
-void abcd(void)
-{
-	PRINTF("I hate this world\n\r");
-	exit(1);
-}
 
-*/

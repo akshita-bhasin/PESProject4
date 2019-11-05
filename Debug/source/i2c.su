@@ -1,4 +1,6 @@
 i2c.c:11:6:I2C_Init	8	static
-i2c.c:51:6:I2C_write_byte	24	static
-i2c.c:75:9:i2c_read_byte	24	static
-i2c.c:104:9:i2c_read_bytes	32	static
+i2c.c:52:6:I2C_write_byte	16	static
+i2c.c:72:6:I2C_write_bytes	24	static
+i2c.c:95:9:i2c_read_byte	24	static
+i2c.c:124:9:i2c_read_bytes	32	static
+i2c.c:163:6:alert_init	16	static
