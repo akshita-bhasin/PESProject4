@@ -9,6 +9,12 @@
 
 #define RESOLUTION 	0.0625
 
+/*
+ * function name : get_TemperatureInC
+ * parameter : int16_t temp
+ * return type : int8_t
+ * @brief : returns the temperature value in Celsius
+ */
 int8_t get_TemperatureInC(int16_t temp)
 {
 	int8_t tempC;
