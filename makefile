@@ -26,7 +26,7 @@ LL := arm-none-eabi-gcc
 
 # Binary/exectable to build
 EXE := \
-  ./debug/PESProject3.axf
+  ./debug/PESProject4.axf
 
 # List of object files
 OBJS := \
@@ -44,9 +44,10 @@ OBJS := \
 	./debug/fsl_smc.o \
 	./debug/fsl_uart.o \
 	./debug/fsl_debug_console.o \
-	./debug/PESProject4.o \
+	./debug/main.o \
 	./debug/led_control.o \
 	./debug/logger.o \
+	./debug/tmp102.o \
 	./debug/i2c.o \
 	./debug/state_machine.o
 	
@@ -66,9 +67,10 @@ C_DEPS = \
 	./debug/fsl_smc.d \
 	./debug/fsl_uart.d \
 	./debug/fsl_debug_console.d \
-	./debug/PESProject4.d \
+	./debug/main.d \
 	./debug/led_control.d \
 	./debug/logger.d \
+	./debug/tmp102.d \
 	./debug/i2c.d \
 	./debug/state_machine.d
 	
@@ -113,7 +115,7 @@ LL := arm-none-eabi-gcc
 
 # Binary/exectable to build
 EXE := \
-  ./debug/PESProject3.axf
+  ./debug/PESProject4.axf
 
 # List of object files
 OBJS := \
@@ -131,9 +133,10 @@ OBJS := \
 	./debug/fsl_smc.o \
 	./debug/fsl_uart.o \
 	./debug/fsl_debug_console.o \
-	./debug/PESProject4.o \
+	./debug/main.o \
 	./debug/led_control.o \
 	./debug/logger.o \
+	./debug/tmp102.o \
 	./debug/i2c.o \
 	./debug/state_machine.o
 	
@@ -153,9 +156,10 @@ C_DEPS = \
 	./debug/fsl_smc.d \
 	./debug/fsl_uart.d \
 	./debug/fsl_debug_console.d \
-	./debug/PESProject4.d \
+	./debug/main.d \
 	./debug/led_control.d \
 	./debug/logger.d \
+	./debug/tmp102.d \
 	./debug/i2c.d \
 	./debug/state_machine.d
 	
@@ -222,6 +226,7 @@ OBJS := \
 	./debug/test.o \
 	./debug/led_control.o \
 	./debug/logger.o \
+	./debug/tmp102.o \
 	./debug/i2c.o \
 	./debug/state_machine.o \
 	./debug/System.o
@@ -242,12 +247,13 @@ C_DEPS = \
 	./debug/fsl_smc.d \
 	./debug/fsl_uart.d \
 	./debug/fsl_debug_console.d \
-	./debug/test.o \
-	./debug/led_control.o \
-	./debug/logger.o \
-	./debug/i2c.o \
-	./debug/state_machine.o \
-	./debug/System.o
+	./debug/test.d \
+	./debug/led_control.d \
+	./debug/logger.d \
+	./debug/tmp102.d \
+	./debug/i2c.d \
+	./debug/state_machine.d \
+	./debug/System.d
 	
 # Compiler options
 CC_OPTIONS := \
@@ -314,7 +320,7 @@ B_OPTIONS := \
 	-D__REDLIB__ -DCPU_MKL25Z128VLK4 -DCPU_MKL25Z128VLK4_cm0plus -DSDK_OS_BAREMETAL \
 	-DFSL_RTOS_BM -DSDK_DEBUGCONSOLE=1 -DCR_INTEGER_PRINTF -DPRINTF_FLOAT_ENABLE=0 \
 	-DSCANF_FLOAT_ENABLE=0 -DPRINTF_ADVANCED_ENABLE=0 -DSCANF_ADVANCED_ENABLE=0 \
-	-D__MCUXPRESSO -D__USE_CMSIS -DDEBUG -DFRDM_KL25Z -DFREEDOM -DDEBUG -specs=redlib.specs \
+	-D__MCUXPRESSO -D__USE_CMSIS -DDEBUG -DFRDM_KL25Z -DFREEDOM -DDEBUG_LOG -specs=redlib.specs \
 	
 ./debug/%.o: ./source/%.c
 	@echo 'Building file: $<'

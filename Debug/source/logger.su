@@ -1,6 +1,0 @@
-logger.c:13:6:log_string_detail	24	static
-logger.c:23:6:log_string	16	static
-logger.c:63:6:log_char	16	static
-logger.c:73:6:log_integer	16	static
-logger.c:83:13:get_func_name	16	static
-logger.c:114:13:get_log_level	16	static

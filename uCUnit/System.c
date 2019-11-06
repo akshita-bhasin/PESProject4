@@ -5,7 +5,7 @@
  * @date : 10/18/2019
  * @version 1.0
  *
- ** Referred to uCUbit from mcuoneclipse for the uCUnit case files
+ ** Referred to uCUnit from mcuoneclipse for the uCUnit case files
 
 *****************************************************************************
  *                                                                           *
@@ -40,9 +40,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "System.h"
-#ifdef KL25Z_UT
 #include "fsl_debug_console.h"
-#endif
 
 void System_exit(int val) {
 	for(;;) {
@@ -57,24 +55,15 @@ void System_exit(int val) {
 /* Stub: Initialize your hardware here */
 void System_Init(void)
 {
-#ifdef KL25Z_UT
-	PRINTF("Init of hardware finished.\n");
-#endif
-#ifdef PC_UT
-	printf("Init of hardware finished.\n");
-#endif
+	PRINTF("Init of hardware finished.\r\n");
 }
 
 /* Stub: Shutdown your hardware here */
 void System_Shutdown(void)
 {
 	/* asm("\tSTOP"); */
-#ifdef KL25Z_UT
-	PRINTF("System shutdown.\n");
-#endif
-#ifdef PC_UT
-	printf("System shutdown.\n");
-#endif
+
+	PRINTF("System shutdown.\r\n");
 	System_exit(0);
 }
 
@@ -83,12 +72,7 @@ void System_Recover(void)
 {
 	/* Stub: Recover the hardware */
 	/* asm("\tRESET"); */
-#ifdef KL25Z_UT
-	PRINTF("System reset.\n");
-#endif
-#ifdef PC_UT
-	printf("System reset.\n");
-#endif
+	PRINTF("System reset.\r\n");
 	System_exit(0);
 }
 
@@ -105,32 +89,19 @@ void System_Safestate(void)
 
 	/* Put processor into idle state */
 	/* asm("\tIDLE"); */
-#ifdef KL25Z_UT
-	PRINTF("System safe state.\n");
-#endif
-#ifdef PC_UT
-	printf("System safe state.\n");
-#endif
+	PRINTF("System safe state.\r\n");
 	System_exit(0);
 }
 
 /* Stub: Transmit a string to the host/debugger/simulator */
 void System_WriteString(char * msg)
 {
-#ifdef KL25Z_UT
 	PRINTF(msg);
-#endif
-#ifdef PC_UT
-	printf(msg);
-#endif
+	PRINTF("\r");
 }
 
 void System_WriteInt(int n)
 {
-#ifdef KL25Z_UT
 	PRINTF("%d", n);
-#endif
-#ifdef PC_UT
-	printf("%d", n);
-#endif
+
 }

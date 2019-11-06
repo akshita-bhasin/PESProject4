@@ -5,26 +5,21 @@
  * @version 1.0
  **/
 
-#ifdef PC_UT
-#include "C:\Users\ASUS\Documents\MCUXpressoIDE_11.0.1_2563\workspace\PES_Project3\uCUnit\uCUnit.h"
-#endif
-#ifdef KL25Z_UT
+//#ifdef TEST
 #include <stdio.h>
 #include "uCUnit.h"
-#include "led_blink.h"
+#include "led_control.h"
+#include <stdint.h>
+#include "logger.h"
+#include "tmp102.h"
+#include "i2c.h"
+#include "state_machine.h"
 #include "board.h"
 #include "peripherals.h"
 #include "pin_mux.h"
 #include "MKL25Z4.h"
 #include "fsl_debug_console.h"
-#endif
-
-#include <stdint.h>
-#include "C:\Users\ASUS\Documents\MCUXpressoIDE_11.0.1_2563\workspace\PES_Project3\source\logger.h"
-#include "C:\Users\ASUS\Documents\MCUXpressoIDE_11.0.1_2563\workspace\PES_Project3\source\memorytest.h"
-#include "C:\Users\ASUS\Documents\MCUXpressoIDE_11.0.1_2563\workspace\PES_Project3\source\pattern_gen.h"
-
-
-#define LENGTH 16
+//#endif
 
 void unit_test_cases(void);
+void delay_loop(uint16_t num);

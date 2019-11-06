@@ -1,14 +1,20 @@
 /*
- * i2c.c
- *
- *  Created on: Oct 29, 2019
- *      Author: ASUS
+ *@File Name : i2c.c
+ *@Brief: Source file contains I2C configuration with the TMP102 Temperature sensor module
+ *Created on: Oct 29, 2019
+ *Author: Akshita Bhasin & Madhukar Arora
  */
 
 #include "i2c.h"
-uint8_t data[3];
+uint8_t data[3]; //to store temperature values received from the sensor
 extern uint8_t disconnect_flag;
 
+/*
+ * function name : I2C_Init
+ * parameter : void
+ * return type : void
+ * @brief : configures the I2C registers on the FRDM KL25Z
+ */
 void I2C_Init(void)
 {
 	/* Enable clock for I2C0 module */
@@ -31,6 +37,11 @@ void I2C_Init(void)
 	I2C0->C2 |= I2C_C2_HDRS_MASK;
 
 	I2C0->SLTH |= I2C_SLTH_SSLT(0x01);
+
+	PORTA->PCR[5] |= PORT_PCR_MUX(1) | PORT_PCR_IRQC(0x09) | PORT_PCR_PE_MASK;
+
+	GPIOA->PDDR |= 0x01 << 5;
+	//NVIC_EnableIRQ(PORTA_IRQHandler());
 }
 
 #define I2C_M_START  I2C0->C1 |= I2C_C1_MST_MASK
@@ -46,10 +57,12 @@ void I2C_Init(void)
 #define NACK        I2C0->C1 |= I2C_C1_TXAK_MASK
 #define ACK         I2C0->C1 &= ~I2C_C1_TXAK_MASK
 
-//extern uint8_t delay;
-//extern uint8_t delay_end;
-
-
+/*
+ * function name : I2C_write_byte
+ * parameter : uint8_t reg - pointer register value , uint8_t data - value for configuration register
+ * return type : void
+ * @brief : writes a single byte to the configuration register
+ */
 void I2C_write_byte(uint8_t reg, uint8_t data)
 {
      I2C_TRAN;                    // Transmit
@@ -61,9 +74,8 @@ void I2C_write_byte(uint8_t reg, uint8_t data)
     	 disconnect_flag=1;
      }
 
-     I2C0->D = reg;              // Device register address
-     /* Pointer register byte 000000+(00) for temperature register read only  */
-     //changed to configuration register
+     I2C0->D = reg;              // Device register address(00 for temperature register read only)
+
      if(i2c_wait())
      {
     	 disconnect_flag=1;
@@ -75,10 +87,15 @@ void I2C_write_byte(uint8_t reg, uint8_t data)
     	 disconnect_flag=1;
      }
 
-     I2C_M_STOP;
-     //Send stop bit
+     I2C_M_STOP;				//Send stop bit
 }
 
+/*
+ * function name : I2C_write_bytes
+ * parameter : uint8_t reg - pointer register value , uint8_t data1 - byte1,uint8_t data2 - byte2
+ * return type : void
+ * @brief : writes two bytes to the configuration register
+ */
 void I2C_write_bytes(uint8_t reg, uint8_t data1, uint8_t data2)
 {
      I2C_TRAN;                    // Transmit
@@ -91,8 +108,7 @@ void I2C_write_bytes(uint8_t reg, uint8_t data1, uint8_t data2)
      }
 
      I2C0->D = reg;              // Device register address
-     /* Pointer register byte 000000+(00) for temperature register read only  */
-     //changed to configuration register
+
      if(i2c_wait())
      {
     	 disconnect_flag=1;
@@ -110,10 +126,15 @@ void I2C_write_bytes(uint8_t reg, uint8_t data1, uint8_t data2)
     	 disconnect_flag=1;
      }
 
-     I2C_M_STOP;
-     //Send stop bit
+     I2C_M_STOP;				//Send stop bit
 }
 
+/*
+ * function name : i2c_read_byte
+ * parameter : uint8_t dev, uint8_t reg - pointer register value
+ * return type : uint8_t
+ * @brief : reads 1 byte of data from the TMP102
+ */
 uint8_t i2c_read_byte(uint8_t dev, uint8_t reg)
 {
 	uint8_t data;
@@ -162,10 +183,10 @@ uint8_t i2c_wait(void)
 	while((I2C0->S &I2C_S_IICIF_MASK) == 0)
 	{
 		i++;
-		if(i>65535)
+		if(i>50000)
 			break;
 	}
-	if(i>65535)
+	if(i>50000)
 		connect = 1;
 	else
 		connect = 0;
@@ -174,10 +195,16 @@ uint8_t i2c_wait(void)
 
 	return connect;
 }
-int8_t i2c_read_bytes(uint8_t dev, uint8_t reg)
+
+/*
+ * function name : i2c_read_bytes
+ * parameter : uint8_t dev, uint8_t reg - pointer register value
+ * return type : int8_t
+ * @brief : reads 2 bytes of temperature data from the TMP102 and returns temperature in Celsius
+ */
+int16_t i2c_read_bytes(uint8_t dev, uint8_t reg)
 {
 	int16_t temp;
-	int8_t tempC;
 
 	I2C_TRAN;
 	I2C_M_START;
@@ -227,12 +254,15 @@ int8_t i2c_read_bytes(uint8_t dev, uint8_t reg)
 	I2C_M_STOP;
 
 	temp = ((data[0] << 4) | (data[1] >> 4));
-	if(temp> 0x7FFF)
-		temp |= 0xF000;
-	tempC = temp * 0.0625;
-	return tempC;
+	return temp;
 }
 
+/*
+ * function name : alert_init
+ * parameter : void
+ * return type : void
+ * @brief : initializes the TLow and THigh value on the TMP102
+ */
 void alert_init(void)
 {
 	uint8_t tl0a=  0x1d;

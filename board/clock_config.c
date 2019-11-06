@@ -93,15 +93,15 @@ void BOARD_InitBootClocks(void)
 name: BOARD_BootClockRUN
 called_from_default_init: true
 outputs:
-- {id: Bus_clock.outFreq, value: 3 MHz}
-- {id: Core_clock.outFreq, value: 6 MHz}
+- {id: Bus_clock.outFreq, value: 24 MHz}
+- {id: Core_clock.outFreq, value: 48 MHz}
 - {id: ERCLK32K.outFreq, value: 1 kHz}
-- {id: Flash_clock.outFreq, value: 3 MHz}
+- {id: Flash_clock.outFreq, value: 24 MHz}
 - {id: LPO_clock.outFreq, value: 1 kHz}
 - {id: MCGIRCLK.outFreq, value: 32.768 kHz}
 - {id: OSCERCLK.outFreq, value: 8 MHz}
 - {id: PLLFLLCLK.outFreq, value: 48 MHz}
-- {id: System_clock.outFreq, value: 6 MHz}
+- {id: System_clock.outFreq, value: 48 MHz}
 settings:
 - {id: MCGMode, value: PEE}
 - {id: MCG.FCRDIV.scale, value: '1', locked: true}
@@ -118,7 +118,7 @@ settings:
 - {id: OSC_CR_ERCLKEN_CFG, value: Enabled}
 - {id: SIM.CLKOUTSEL.sel, value: SIM.OUTDIV4}
 - {id: SIM.OSC32KSEL.sel, value: PMC.LPOCLK}
-- {id: SIM.OUTDIV1.scale, value: '16', locked: true}
+- {id: SIM.OUTDIV1.scale, value: '2', locked: true}
 - {id: SIM.PLLFLLSEL.sel, value: SIM.MCGPLLCLK_DIV2}
 - {id: SIM.TPMSRCSEL.sel, value: SIM.PLLFLLSEL}
 - {id: SIM.UART0SRCSEL.sel, value: SIM.PLLFLLSEL}
@@ -151,7 +151,7 @@ const sim_clock_config_t simConfig_BOARD_BootClockRUN =
     {
         .pllFllSel = SIM_PLLFLLSEL_MCGPLLCLK_CLK, /* PLLFLL select: MCGPLLCLK clock */
         .er32kSrc = SIM_OSC32KSEL_LPO_CLK,        /* OSC32KSEL select: LPO clock */
-        .clkdiv1 = 0xf0010000U,                   /* SIM_CLKDIV1 - OUTDIV1: /16, OUTDIV4: /2 */
+        .clkdiv1 = 0x10010000U,                   /* SIM_CLKDIV1 - OUTDIV1: /2, OUTDIV4: /2 */
     };
 const osc_config_t oscConfig_BOARD_BootClockRUN =
     {

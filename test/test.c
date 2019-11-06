@@ -7,172 +7,109 @@
 
 #include "test.h"
 
-uint8_t i;
-const int8_t seed = 8;
-uint8_t status;
-uint32_t * address = NULL;
-uint32_t verify_arr[16];
-
 /*
  Function Name: unit_test_cases
  Function arguments: void
  Function return type: void
  Brief: performs unit tests on various memory functions
 */
+
+extern state current_state;
+extern event current_event;
+void delay_loop(uint16_t num)
+{
+	for(uint8_t i=num; i>0; i--);
+}
 void unit_test_cases(void)
 {
+	I2C_Init();
 	//Test case for allocate bytes
-	UCUNIT_TestcaseBegin("Allocate bytes test pass");
-	uint32_t * allocate_test_1 = allocate_words(LENGTH);
-	UCUNIT_CheckIsNotNull(allocate_test_1);
+	UCUNIT_TestcaseBegin("Testing config register write/read byte setting\r\n");
+	I2C_write_byte(0x01, 0x62);
+	delay_loop(10000);
+	uint8_t data = i2c_read_byte(0x90, 0x01);
+	UCUNIT_CheckIsEqual(data, 0x62);
 	UCUNIT_TestcaseEnd();
-	free_words(allocate_test_1); // freeing allocated memory after every test case
 
-	//Test for boundary conditions in allocate
-	UCUNIT_TestcaseBegin("Allocate bytes test fail");
-	uint32_t * allocate_test_2 = allocate_words(5000);
-	UCUNIT_CheckIsNull(allocate_test_2);
-#ifdef KL25Z_UT
-	LED_RED_ON();
-	LED_GREEN_OFF();
-	LED_BLUE_OFF();
-#endif
+	UCUNIT_TestcaseBegin("Testing temperature register read byte setting\r\n");
+	int8_t tempC = i2c_read_bytes(0x90, 0x00);
+	UCUNIT_CheckIs8Bit(tempC);
 	UCUNIT_TestcaseEnd();
-	free_words(allocate_test_2);
 
-	//Write pattern test if status is 0
-	UCUNIT_TestcaseBegin("Write pattern pass test");
-	uint32_t * write_pattern_alloc = allocate_words(LENGTH);
-	status = write_pattern(write_pattern_alloc, LENGTH, seed);
-	UCUNIT_CheckIsEqual(status,0);
+	UCUNIT_TestcaseBegin("Testing post test case pass\r\n");
+	uint8_t post_value = i2c_read_byte(0x90, 0x01);
+	UCUNIT_CheckIsEqual(post_value,0x60);
+	UCUNIT_CheckIsEqual(post_value,0x62);
 	UCUNIT_TestcaseEnd();
-	free_words(write_pattern_alloc);
 
-	//Display memory test to check if any memory displayed
-	UCUNIT_TestcaseBegin("Display memory test");
-	uint32_t * disp_mem_alloc = allocate_words(LENGTH);
-	uint8_t * disp_mem = display_memory(disp_mem_alloc, LENGTH);
-	UCUNIT_CheckIsNotNull(disp_mem);
+	UCUNIT_TestcaseBegin("Testing disconnect test case\r\n");
+	uint8_t discon_value = i2c_read_byte(0x90, 0x01);
+	UCUNIT_CheckIsEqual(discon_value,0x00);
 	UCUNIT_TestcaseEnd();
-	free_words(disp_mem_alloc);
 
-	/* Write memory test for storing AA in memory, checking if 8 bit,
-	 * if written successfully, and if actually written in memory
-	 * by reading it
-	 */
-	UCUNIT_TestcaseBegin("Write memory test pass");
-	uint32_t * write_mem_alloc = allocate_words(LENGTH);
-	for(i=0;i<LENGTH/4;i++) {
-		status = write_memory(get_address(write_mem_alloc, i), 0xAA);
-		UCUNIT_CheckIs8Bit(0xAA);
-		UCUNIT_CheckIsEqual(status,0);
-	}
-	for(i=0; i<LENGTH/16; i++) {
-		uint8_t mem_value = *((uint8_t*)(write_mem_alloc+i));
-		UCUNIT_CheckIsEqual(mem_value, 0xAA);
-	}
+	UCUNIT_TestcaseBegin("Testing TL0 and TH0 before setting them\r\n");
+	uint8_t tl0_value = i2c_read_byte(0x90, 0x02);
+	UCUNIT_CheckIsEqual(tl0_value,0x20);
+	uint8_t th0_value = i2c_read_byte(0x90, 0x03);
+	UCUNIT_CheckIsEqual(th0_value,0x40);
 	UCUNIT_TestcaseEnd();
-	free_words(write_mem_alloc);
 
-	/* Write memory test for storing AA in memory, checking if
-	 * written successfully, and if actually written in memory
-	 * by reading it
-	 */
-	UCUNIT_TestcaseBegin("Write memory test fail");
-	uint32_t * write_mem_fail_alloc = allocate_words(LENGTH);
-	for(i=0;i<LENGTH/4;i++) {
-		status = write_memory(get_address(write_mem_fail_alloc, i*200), 0xAA);
-		UCUNIT_CheckIsEqual(status,0);
-	}
-	for(i=0; i<LENGTH/16; i++) {
-		uint8_t mem_fail_value = *((uint8_t*)(write_mem_fail_alloc+i));
-		UCUNIT_CheckIsEqual(mem_fail_value, 0xAA);
-	}
-	UCUNIT_TestcaseEnd();
-	free_words(write_mem_fail_alloc);
+	uint8_t tl0a=  0x1d;
+	uint8_t tl0b= 0x00;
 
-	/* Invert block in memory test, checking if inverted
-	 * successfully, and if actually written in memory by reading it
-	 */
-	UCUNIT_TestcaseBegin("Invert memory block test pass");
-	uint32_t * invert_block_alloc = allocate_words(LENGTH);
-	for(i=0;i<LENGTH/4;i++) {
-		*(invert_block_alloc+i) = i;
-		status = invert_block(get_address(invert_block_alloc, i), 4);
-		UCUNIT_CheckIsEqual(status,0);
-	}
-	for(i=0; i<LENGTH/8; i++) {
-		uint8_t invert_value = *((uint8_t*)(invert_block_alloc+i));
-		UCUNIT_CheckIsEqual(invert_value, i^0xFF);
-	}
-	UCUNIT_TestcaseEnd();
-	free_words(invert_block_alloc);
+	uint8_t th0a = 0x3b;
+	uint8_t th0b = 0x00;
 
-	/* Invert block in memory test, checking if inverted
-	 * successfully, and if actually written in memory by reading it
-	 */
-	UCUNIT_TestcaseBegin("Invert memory block test fail");
-	uint32_t * invert_block_fail_alloc = allocate_words(LENGTH);
-	for(i=0;i<LENGTH/4;i++) {
-		*(invert_block_alloc+i) = i;
-		status = invert_block(get_address(invert_block_fail_alloc, i), 4);
-		UCUNIT_CheckIsEqual(status,0);
-	}
-	for(i=0; i<LENGTH/4; i++) {
-		uint8_t invert_fail_value = *((uint8_t*)(invert_block_fail_alloc+i));
-		UCUNIT_CheckIsEqual(invert_fail_value, i);
-	}
-	UCUNIT_TestcaseEnd();
-	free_words(invert_block_fail_alloc);
+	I2C_write_bytes(0x02, tl0a, tl0b);
+	delay_loop(10000);
+	I2C_write_bytes(0x03, th0a, th0b);
 
-	// Get adddress with offset from memory, checking if written
-	UCUNIT_TestcaseBegin("Get address test");
-	uint32_t * get_addr_alloc = allocate_words(LENGTH);
-	uint32_t * get_addr = NULL;
-	for(i=0;i<LENGTH/16;i++) {
-		get_addr = get_address(get_addr_alloc, i);
-		UCUNIT_CheckIsEqual(get_addr, (get_addr_alloc+i));
-	}
+	UCUNIT_TestcaseBegin("Testing TL0 and TH0 after setting them\r\n");
+	uint8_t tl0_value_1 = i2c_read_byte(0x90, 0x02);
+	UCUNIT_CheckIsEqual(tl0_value_1,0x1d);
+	uint8_t th0_value_1 = i2c_read_byte(0x90, 0x03);
+	UCUNIT_CheckIsEqual(th0_value_1,0x3b);
 	UCUNIT_TestcaseEnd();
-	free_words(get_addr_alloc);
 
-	/* Verify memory test, by writing a pattern,
-	 * and verifying if new pattern is same as earlier pattern
-	 */
-	UCUNIT_TestcaseBegin("Verify memory test ");
-	uint32_t * verify_mem_alloc = allocate_words(LENGTH);
-	status = write_pattern(verify_mem_alloc, LENGTH, seed);
-	UCUNIT_CheckIsEqual(status,0);
-	address = verify_pattern(verify_mem_alloc, LENGTH, seed);
-	UCUNIT_CheckIsEqual(address[0], 0);
+	UCUNIT_TestcaseBegin("Testing Alert Pin Polarity\r\n");
+	I2C_write_byte(0x01, 0x60);
+	uint8_t alert_positive = i2c_read_byte(0x90, 0x01);
+	UCUNIT_CheckIsEqual(alert_positive,0x60);
+	I2C_write_byte(0x01, 0x64);
+	uint8_t alert_negative = i2c_read_byte(0x90, 0x01);
+	UCUNIT_CheckIsEqual(alert_negative,0x64);
 	UCUNIT_TestcaseEnd();
-	free_words(verify_mem_alloc);
 
-	/* Verify memory test, by writing a pattern,
-	 * and verifying if new pattern is different from earlier pattern
-	 */
-	UCUNIT_TestcaseBegin("Verify memory test with failed address");
-	uint32_t * verify_mem_alloc_fail = allocate_words(LENGTH);
-	status = write_pattern(verify_mem_alloc_fail, LENGTH, seed);
-	UCUNIT_CheckIsEqual(status,0);
-	write_memory(get_address(verify_mem_alloc_fail, 1), 0x11);
-	write_memory(get_address(verify_mem_alloc_fail, 2), 0x22);
-	address = verify_pattern(verify_mem_alloc_fail, LENGTH, seed);
-	UCUNIT_CheckIsNotNull(address);
+	UCUNIT_TestcaseBegin("Testing Thermostat Mode bit pin\r\n");
+	I2C_write_byte(0x01, 0x60);
+	uint8_t comparator_mode = i2c_read_byte(0x90, 0x01);
+	UCUNIT_CheckIsEqual(comparator_mode,0x60);
+	I2C_write_byte(0x01, 0x62);
+	uint8_t interrupt_mode = i2c_read_byte(0x90, 0x01);
+	UCUNIT_CheckIsEqual(interrupt_mode,0x62);
 	UCUNIT_TestcaseEnd();
-	free_words(verify_mem_alloc_fail);
 
-	//Free words unit test to check for a fail case
-	UCUNIT_TestcaseBegin("Free words test");
-	uint32_t * free_words_alloc = allocate_words(LENGTH);
-	free_words(free_words_alloc);
-	UCUNIT_CheckIsNull(free_words_alloc);
+	UCUNIT_TestcaseBegin("State Machine Test case\r\n");
+	UCUNIT_TestcaseBegin("State Machine Init Test Case- Pass\r\n");
+	log_string("Initial values test");
+	UCUNIT_CheckIsEqual(current_event, Complete);
+	UCUNIT_CheckIsEqual(current_state, Temp_Reading);
 	UCUNIT_TestcaseEnd();
+
+	UCUNIT_TestcaseBegin("State Machine Test case\r\n");
+	UCUNIT_TestcaseBegin("State Machine Init Test Case- Fail\r\n");
+	log_string("Initial values test");
+	UCUNIT_CheckIsEqual(current_event, Disconnect);
+	UCUNIT_CheckIsEqual(current_state, Disconnected);
+	UCUNIT_TestcaseEnd();
+
+	UCUNIT_TestcaseEnd();
+
 }
 
 int main(void) {
 	//Initializing board pins
-#ifdef KL25Z_UT
+#ifdef TEST
 	BOARD_InitBootPins();
 	BOARD_InitBootClocks();
 	BOARD_InitBootPeripherals();

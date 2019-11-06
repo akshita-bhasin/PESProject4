@@ -1,9 +1,8 @@
 /*
- * @file logger.h
- * @brief contains function prototypes and header files for logger.c
- * @author Akshita Bhasin and Madhukar Arora
- * @date 10/15/2019
- * @version 1.0
+ * @File  : logger.h
+ * @Brief : contains function prototypes and includes for logger implementation
+ * @Author : Akshita Bhasin and Madhukar Arora
+ * @Created On : 11/1/2019
  */
 
 
@@ -40,10 +39,9 @@ typedef enum
 	Turn_on_LED_color
 }function_name;
 
+//function prototypes
 const char* get_func_name(function_name func_name);
-
 const char* get_log_level(log_level logLevel);
-
 void log_string_detail(log_level logLevel, function_name func_name, char * str);
 
 // Log_integer – display an integer
@@ -53,6 +51,5 @@ void log_integer(uint8_t num, char type);
 void log_char(char ch);
 
 void log_string(char * str);
-
 
 #endif /* LOGGER_H_ */
