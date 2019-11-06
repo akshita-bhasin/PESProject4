@@ -61,6 +61,8 @@ IDE USED : MCU Xpresso ([https://mcuxpresso.nxp.com/en/welcome](https://mcuxpres
 
 Observations:
 
-1.  While observing the I2C transactions on the logic analyser, the SCL and the SDA lines constantly read high even though the temperature was being read from the sensor. The issue was resolved by reducing the sampling rate from 100MHz to 50MHz and increasing the logic threshold level to 1.75V
+1.  While observing the I2C transactions on the logic analyser, the SCL and the SDA lines constantly read high even though the temperature was being read from the sensor. The issue was resolved by reducing the sampling rate from 100MHz to 10MHz and increasing the logic threshold level to 2.05V
     
-2.  There were issues with reading temperature values from the TMP102 via I2C. Initially we were reading only single byte of data which resulted in erroneous temperature values. On reading the TMP102 data sheet, this error was solved by reading two bytes of data.
+2.  There were issues with reading temperature values from the TMP102 via I2C. Initially we were reading data from the TMP102, but forgot to shift the device address.
+
+3. We had to add delays between read and write bytes in the i2c to get proper NACK and ACK from the device.
