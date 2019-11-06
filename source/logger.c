@@ -66,13 +66,18 @@ const char* get_func_name(function_name func_name)
 {
 	switch(func_name)
 	{
+#ifdef DEBUG_LOG
 		case i2C_Init: return "I2C Init- to initialize I2C: ";
 						break;
 		case I2c_read_byte: return "I2C_read_byte- reads a single byte of data: ";
 							break;
-		case I2c_read_bytes: return "I2C_read_bytes- reads two bytes of data and gives out temperature in Celsius: ";
+		case I2c_read_bytes: return "I2C_read_bytes- reads two bytes of data and returns a 16 bit value: ";
 							break;
-		case init_SysTick: return "Init_SysTick- Initialize SysTick Timer to run for 1 second: ";
+		case I2c_write_byte: return "I2C_write_byte- writes a single byte of data: ";
+							break;
+		case I2c_write_bytes: return "I2C_read_bytes- writes two bytes of data: ";
+							break;
+		case Get_TemperatureInC: return "get_Temperature in C- takes a 16 bit value and returns temperature in Celsius: ";
 							break;
 		case State_machine_1: return "state_machine_1- state driven state machine: ";
 							break;
@@ -80,9 +85,9 @@ const char* get_func_name(function_name func_name)
 									break;
 		case Temp_reading: return "temp_reading- reads temperature from the sensor and prints in Celsius and Farhenheit: ";
 							break;
-		case Average_temp: return "I2C Init";
+		case Average_temp: return "average_temp";
 							break;
-		case Temp_alert: return "temp_alert- alerts when temperature goes below Tlow or goes above Thigh: ";
+		case Temp_alert: return "temp_alert- alerts when temperature goes below 0 degree C: ";
 							break;
 		case Disconnect_device: return "disconnect_device- stops the program: ";
 							break;
@@ -90,6 +95,38 @@ const char* get_func_name(function_name func_name)
 							break;
 		case Turn_on_LED_color: return "turn_on_LED_Color- turns on chosen color of LED: ";
 							break;
+#endif
+
+#ifdef NORMAL
+		case i2C_Init: return "I2C Init: ";
+						break;
+		case I2c_read_byte: return "I2C_read_byte: ";
+							break;
+		case I2c_read_bytes: return "I2C_read_bytes: ";
+							break;
+		case I2c_write_byte: return "I2C_write_byte: ";
+							break;
+		case I2c_write_bytes: return "I2C_write_bytes: ";
+							break;
+		case Get_TemperatureInC: return "get_Temperature in C: ";
+							break;
+		case State_machine_1: return "state_machine_1: ";
+							break;
+		case State_machine_2: return "state_machine_2: ";
+									break;
+		case Temp_reading: return "temp_reading: ";
+							break;
+		case Average_temp: return "average_wait: ";
+							break;
+		case Temp_alert: return "temp_alert: ";
+							break;
+		case Disconnect_device: return "disconnect_device: ";
+							break;
+		case END: return "END: ";
+							break;
+		case Turn_on_LED_color: return "turn_on_LED_Color: ";
+							break;
+#endif
 	}
 }
 

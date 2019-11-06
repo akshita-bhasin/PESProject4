@@ -62,6 +62,12 @@ int main(void)
     log_string("Post data read is: ");
     log_integer(post_status, 'd');
     I2C_write_bytes(0x01, 0x60, 0xA0);
+#ifdef DEBUG_LOG
+    log_string_detail(Debug, I2c_write_bytes, "0x60 and 0xA0 written into config register");
+#endif
+#ifdef NORMAL
+    log_string_detail(Status, I2c_write_bytes, "0x60 and 0xA0 written");
+#endif
     delay_loop(20000);
     uint8_t data1 = i2c_read_byte(0x90, 0x01);
 #ifdef DEBUG_LOG
